@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok店铺利润计算器 - 海南跨境突击小分队专版</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #1a1a1a;
+            --accent: #ff0080;
+            --success: #00ff88;
+            --danger: #ff4444;
+            --warning: #ffaa00;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #888888;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .converter-section {
+            flex: 0 0 320px;
+        }
+
+        .result-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .section-title {
+            color: var(--text-light);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background-color: #334155;
+            border: 2px solid #475569;
+            border-radius: 4px;
+            color: var(--text-light);
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .exchange-rate-display {
+            background-color: var(--secondary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .rate-value {
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .rate-time {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #00cc77;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: #2a2a2a;
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #e60073;
+        }
+
+        .converter-group {
+            margin-bottom: 25px;
+        }
+
+        .converter-title {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .converter-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--secondary);
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .result-primary {
+            color: var(--primary);
+        }
+
+        .result-accent {
+            color: var(--accent);
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            display: contents;
+        }
+
+        .result-label {
+            color: var(--text-light);
+        }
+
+        .result-value {
+            color: var(--text-light);
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .result-value-secondary {
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .profit-positive {
+            color: var(--success);
+        }
+
+        .profit-negative {
+            color: var(--danger);
+        }
+
+        .cost-breakdown {
+            margin-bottom: 20px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profit-level {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .profit-high {
+            background-color: #064e3b;
+            color: var(--success);
+        }
+
+        .profit-medium {
+            background-color: #78350f;
+            color: var(--warning);
+        }
+
+        .profit-low {
+            background-color: #7f1d1d;
+            color: var(--danger);
+        }
+
+        .advice-box {
+            padding: 15px;
+            background-color: var(--secondary);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .manual-rate {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .manual-rate input {
+            flex: 1;
+        }
+
+        .manual-rate button {
+            width: auto;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 20px 0;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .converter-section {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TikTok店铺利润计算器 - 海南跨境突击小分队专版</h1>
+        </div>
+
+        <div class="content">
+            <!-- 输入参数区域 -->
+            <div class="section input-section">
+                <h2 class="section-title">成本参数设置</h2>
+
+                <div class="input-group">
+                    <label class="input-label">商品进价 (MY)</label>
+                    <input type="number" id="cost-price" class="input-field" value="4.2" step="0.1" min="0">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">商品售价 (MY)</label>
+                    <input type="number" id="sale-price" class="input-field" value="35.0" step="0.1" min="0">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">商品重量 (g)</label>
+                    <input type="number" id="weight" class="input-field" value="16.9" step="0.1" min="0">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">预估月销量</label>
+                    <input type="number" id="quantity" class="input-field" value="100" step="1" min="0">
+                </div>
+
+                <div class="input-group">
+                    <h3 class="input-label">实时汇率设置</h3>
+                    <div class="exchange-rate-display">
+                        <div id="rate-value" class="rate-value">正在获取汇率...</div>
+                        <div id="rate-time" class="rate-time"></div>
+                    </div>
+
+                    <button id="refresh-rate" class="btn btn-secondary">刷新汇率</button>
+
+                    <div class="manual-rate">
+                        <input type="number" id="manual-rate" class="input-field" value="0.66" step="0.001" min="0.1" max="2.0">
+                        <button id="apply-manual-rate" class="btn btn-secondary">应用手动汇率</button>
+                    </div>
+                </div>
+
+                <button id="calculate-btn" class="btn btn-primary">计算成本利润</button>
+            </div>
+
+            <!-- 汇率换算区域 -->
+            <div class="section converter-section">
+                <h2 class="section-title">汇率实时换算器</h2>
+
+                <div class="converter-group">
+                    <h3 class="converter-title">人民币 (CNY) → 马币 (MYR)</h3>
+                    <input type="number" id="cny-input" class="input-field" value="100" step="1" min="0">
+                    <div class="converter-result result-primary" id="cny-to-myr-result">马币: 0.00 MYR</div>
+                    <button id="convert-cny" class="btn btn-primary">换算 →</button>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="converter-group">
+                    <h3 class="converter-title">马币 (MYR) → 人民币 (CNY)</h3>
+                    <input type="number" id="myr-input" class="input-field" value="100" step="1" min="0">
+                    <div class="converter-result result-accent" id="myr-to-cny-result">人民币: 0.00 CNY</div>
+                    <button id="convert-myr" class="btn btn-accent">换算 →</button>
+                </div>
+            </div>
+
+            <!-- 结果显示区域 -->
+            <div class="section result-section">
+                <h2 class="section-title">利润分析报告</h2>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">总成本</div>
+                        <div id="total-cost" class="result-value">MY 0.00</div>
+                        <div id="total-cost-rmb" class="result-value-secondary">Rmb 0.00</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">毛利润</div>
+                        <div id="gross-profit" class="result-value">MY 0.00</div>
+                        <div id="gross-profit-rmb" class="result-value-secondary">Rmb 0.00</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">毛利率</div>
+                        <div id="profit-margin" class="result-value">0.00%</div>
+                        <div></div>
+                    </div>
+                </div>
+
+                <div class="cost-breakdown">
+                    <h3 class="input-label">成本明细</h3>
+                    <div class="cost-item">
+                        <span>商品进价</span>
+                        <span id="cost-price-display">MY 0.00</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>义务仓面单 (Rmb 1.5)</span>
+                        <span id="fixed-operation-display">MY 0.00</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>海运物流 (MY 0.15/10g)</span>
+                        <span id="sea-shipping-display">MY 0.00</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>平台佣金 (13.8%)</span>
+                        <span id="platform-commission-display">MY 0.00</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>物流费用</span>
+                        <span id="shipping-display">MY 0.00</span>
+                    </div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">预估月利润</div>
+                        <div id="monthly-profit" class="result-value">MY 0.00</div>
+                        <div id="monthly-profit-rmb" class="result-value-secondary">Rmb 0.00</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">单件利润</div>
+                        <div id="unit-profit" class="result-value">MY 0.00</div>
+                        <div id="unit-profit-rmb" class="result-value-secondary">Rmb 0.00</div>
+                    </div>
+                </div>
+
+                <div id="current-exchange" class="rate-time">当前汇率: 1 CNY = 0.6600 MYR</div>
+
+                <div id="profit-level" class="profit-level">等待输入数据...</div>
+
+                <div id="advice-box" class="advice-box">请填写完整的成本参数</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 成本参数配置
+        const fixedCosts = {
+            fixed_operation_fee: 1.5,           // 义务仓面单固定价 (人民币)
+            sea_shipping_rate: 0.15,            // 海运物流费率 (马币/10g)
+            platform_commission_rate: 0.138,    // 平台佣金比例 (13.8%)
+            shipping_cost: 8.31                 // 固定物流费用 (马币)
+        };
+
+        // 汇率配置
+        let exchangeRate = 0.66;
+        let lastUpdateTime = null;
+
+        // DOM元素
+        const elements = {
+            // 输入字段
+            costPrice: document.getElementById('cost-price'),
+            salePrice: document.getElementById('sale-price'),
+            weight: document.getElementById('weight'),
+            quantity: document.getElementById('quantity'),
+
+            // 汇率相关
+            rateValue: document.getElementById('rate-value'),
+            rateTime: document.getElementById('rate-time'),
+            refreshRate: document.getElementById('refresh-rate'),
+            manualRate: document.getElementById('manual-rate'),
+            applyManualRate: document.getElementById('apply-manual-rate'),
+            currentExchange: document.getElementById('current-exchange'),
+
+            // 换算器
+            cnyInput: document.getElementById('cny-input'),
+            myrInput: document.getElementById('myr-input'),
+            cnyToMyrResult: document.getElementById('cny-to-myr-result'),
+            myrToCnyResult: document.getElementById('myr-to-cny-result'),
+            convertCny: document.getElementById('convert-cny'),
+            convertMyr: document.getElementById('convert-myr'),
+
+            // 计算结果
+            calculateBtn: document.getElementById('calculate-btn'),
+            totalCost: document.getElementById('total-cost'),
+            totalCostRmb: document.getElementById('total-cost-rmb'),
+            grossProfit: document.getElementById('gross-profit'),
+            grossProfitRmb: document.getElementById('gross-profit-rmb'),
+            profitMargin: document.getElementById('profit-margin'),
+            monthlyProfit: document.getElementById('monthly-profit'),
+            monthlyProfitRmb: document.getElementById('monthly-profit-rmb'),
+            unitProfit: document.getElementById('unit-profit'),
+            unitProfitRmb: document.getElementById('unit-profit-rmb'),
+
+            // 成本明细
+            costPriceDisplay: document.getElementById('cost-price-display'),
+            fixedOperationDisplay: document.getElementById('fixed-operation-display'),
+            seaShippingDisplay: document.getElementById('sea-shipping-display'),
+            platformCommissionDisplay: document.getElementById('platform-commission-display'),
+            shippingDisplay: document.getElementById('shipping-display'),
+
+            // 利润等级和建议
+            profitLevel: document.getElementById('profit-level'),
+            adviceBox: document.getElementById('advice-box')
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+
+            // 获取初始汇率
+            fetchExchangeRate();
+
+            // 初始计算
+            calculateProfit();
+
+            // 初始换算
+            convertCnyToMyr();
+            convertMyrToCny();
+        });
+
+        function bindEvents() {
+            // 输入变化时重新计算
+            elements.costPrice.addEventListener('input', calculateProfit);
+            elements.salePrice.addEventListener('input', calculateProfit);
+            elements.weight.addEventListener('input', calculateProfit);
+            elements.quantity.addEventListener('input', calculateProfit);
+
+            // 汇率相关事件
+            elements.refreshRate.addEventListener('click', fetchExchangeRate);
+            elements.applyManualRate.addEventListener('click', applyManualExchangeRate);
+
+            // 换算器事件
+            elements.convertCny.addEventListener('click', convertCnyToMyr);
+            elements.convertMyr.addEventListener('click', convertMyrToCny);
+
+            // 计算按钮
+            elements.calculateBtn.addEventListener('click', calculateProfit);
+        }
+
+        // 获取实时汇率
+        async function fetchExchangeRate() {
+            elements.rateValue.textContent = "正在获取汇率...";
+
+            try {
+                // 尝试多个汇率API
+                const apis = [
+                    "https://api.exchangerate-api.com/v4/latest/CNY",
+                    "https://api.frankfurter.app/latest?from=CNY&to=MYR"
+                ];
+
+                let rateFound = false;
+
+                for (const api of apis) {
+                    try {
+                        const response = await fetch(api);
+                        if (response.ok) {
+                            const data = await response.json();
+                            const myrRate = data.rates?.MYR;
+
+                            if (myrRate) {
+                                exchangeRate = myrRate;
+                                rateFound = true;
+                                break;
+                            }
+                        }
+                    } catch (error) {
+                        console.log(`API ${api} 失败:`, error);
+                    }
+                }
+
+                if (!rateFound) {
+                    // 使用默认汇率
+                    exchangeRate = 0.66;
+                }
+
+                lastUpdateTime = new Date();
+                updateExchangeRateDisplay();
+
+            } catch (error) {
+                console.error("获取汇率失败:", error);
+                exchangeRate = 0.66;
+                lastUpdateTime = new Date();
+                updateExchangeRateDisplay();
+            }
+        }
+
+        function updateExchangeRateDisplay() {
+            elements.rateValue.textContent = `1 人民币 = ${exchangeRate.toFixed(4)} 马币`;
+
+            if (lastUpdateTime) {
+                const timeStr = lastUpdateTime.toLocaleTimeString();
+                elements.rateTime.textContent = `更新时间: ${timeStr}`;
+            }
+
+            elements.manualRate.value = exchangeRate.toFixed(4);
+            elements.currentExchange.textContent = `当前汇率: 1 CNY = ${exchangeRate.toFixed(4)} MYR`;
+
+            // 重新计算利润
+            calculateProfit();
+
+            // 更新换算器显示
+            convertCnyToMyr();
+            convertMyrToCny();
+        }
+
+        function applyManualExchangeRate() {
+            const manualRate = parseFloat(elements.manualRate.value);
+
+            if (isNaN(manualRate) || manualRate < 0.1 || manualRate > 2.0) {
+                alert("请输入合理的汇率值 (0.1-2.0)");
+                return;
+            }
+
+            exchangeRate = manualRate;
+            lastUpdateTime = new Date();
+            updateExchangeRateDisplay();
+            alert("手动汇率已应用！");
+        }
+
+        // 汇率换算功能
+        function convertCnyToMyr() {
+            try {
+                const cnyAmount = parseFloat(elements.cnyInput.value) || 0;
+                const myrAmount = cnyAmount * exchangeRate;
+                elements.cnyToMyrResult.textContent = `马币: ${myrAmount.toFixed(2)} MYR`;
+            } catch (error) {
+                elements.cnyToMyrResult.textContent = "换算失败";
+            }
+        }
+
+        function convertMyrToCny() {
+            try {
+                const myrAmount = parseFloat(elements.myrInput.value) || 0;
+                const cnyAmount = myrAmount / exchangeRate;
+                elements.myrToCnyResult.textContent = `人民币: ${cnyAmount.toFixed(2)} CNY`;
+            } catch (error) {
+                elements.myrToCnyResult.textContent = "换算失败";
+            }
+        }
+
+        // 利润计算功能
+        function calculateProfit() {
+            try {
+                // 获取输入值
+                const costPrice = parseFloat(elements.costPrice.value) || 0;
+                const salePrice = parseFloat(elements.salePrice.value) || 0;
+                const weight = parseFloat(elements.weight.value) || 0;
+                const quantity = parseFloat(elements.quantity.value) || 0;
+
+                // 检查必要输入是否完整
+                if (costPrice <= 0 || salePrice <= 0 || weight <= 0 || quantity <= 0) {
+                    showWaitingState();
+                    return;
+                }
+
+                // ========== 成本计算逻辑 ==========
+                // 1. 义务仓面单固定价 (人民币转马币)
+                const fixedOperationFeeRmb = fixedCosts.fixed_operation_fee;
+                const fixedOperationFeeMy = fixedOperationFeeRmb * exchangeRate;
+
+                // 2. 海运物流费用 (0.15马币/10g)
+                const seaShippingCost = (weight / 10) * fixedCosts.sea_shipping_rate;
+
+                // 3. 物流费用 (固定费用)
+                const shippingCost = fixedCosts.shipping_cost;
+
+                // 4. 平台佣金 ((售价 + 物流费用) * 13.8%)
+                const platformCommission = (salePrice + shippingCost) * fixedCosts.platform_commission_rate;
+
+                // 计算总成本
+                const totalCost = costPrice + fixedOperationFeeMy + seaShippingCost +
+                                 platformCommission + shippingCost;
+
+                // 计算利润相关数据
+                const grossProfit = salePrice - totalCost;
+                const profitMargin = salePrice > 0 ? (grossProfit / salePrice) * 100 : 0;
+                const monthlyProfit = grossProfit * quantity;
+                const unitProfit = grossProfit;
+
+                // 计算人民币金额
+                const totalCostRmb = myToRmb(totalCost);
+                const grossProfitRmb = myToRmb(grossProfit);
+                const monthlyProfitRmb = myToRmb(monthlyProfit);
+                const unitProfitRmb = myToRmb(unitProfit);
+
+                // 更新界面显示
+                updateDisplay(
+                    costPrice, fixedOperationFeeMy, seaShippingCost,
+                    platformCommission, shippingCost, totalCost,
+                    grossProfit, profitMargin, monthlyProfit, unitProfit,
+                    totalCostRmb, grossProfitRmb, monthlyProfitRmb, unitProfitRmb
+                );
+
+                // 显示利润等级和建议
+                showProfitLevel(profitMargin, grossProfit);
+                showAdvice(costPrice, salePrice, grossProfit, profitMargin);
+
+            } catch (error) {
+                console.error("计算错误:", error);
+            }
+        }
+
+        function myToRmb(myAmount) {
+            return myAmount / exchangeRate;
+        }
+
+        function showWaitingState() {
+            // 重置所有显示值为0
+            elements.totalCost.textContent = "MY 0.00";
+            elements.totalCostRmb.textContent = "Rmb 0.00";
+            elements.grossProfit.textContent = "MY 0.00";
+            elements.grossProfitRmb.textContent = "Rmb 0.00";
+            elements.profitMargin.textContent = "0.00%";
+            elements.monthlyProfit.textContent = "MY 0.00";
+            elements.monthlyProfitRmb.textContent = "Rmb 0.00";
+            elements.unitProfit.textContent = "MY 0.00";
+            elements.unitProfitRmb.textContent = "Rmb 0.00";
+
+            // 重置成本明细
+            elements.costPriceDisplay.textContent = "MY 0.00";
+            elements.fixedOperationDisplay.textContent = "MY 0.00";
+            elements.seaShippingDisplay.textContent = "MY 0.00";
+            elements.platformCommissionDisplay.textContent = "MY 0.00";
+            elements.shippingDisplay.textContent = "MY 0.00";
+
+            // 显示提示信息
+            elements.profitLevel.textContent = "等待输入数据...";
+            elements.profitLevel.className = "profit-level profit-low";
+            elements.adviceBox.textContent = "请填写完整的成本参数";
+        }
+
+        function updateDisplay(costPrice, fixedOperationFee, seaShippingCost,
+                              platformCommission, shippingCost, totalCost,
+                              grossProfit, profitMargin, monthlyProfit, unitProfit,
+                              totalCostRmb, grossProfitRmb, monthlyProfitRmb, unitProfitRmb) {
+            // 更新主要结果 - 马币
+            elements.totalCost.textContent = `MY ${totalCost.toFixed(2)}`;
+            elements.grossProfit.textContent = `MY ${grossProfit.toFixed(2)}`;
+            elements.profitMargin.textContent = `${profitMargin.toFixed(2)}%`;
+            elements.monthlyProfit.textContent = `MY ${monthlyProfit.toFixed(2)}`;
+            elements.unitProfit.textContent = `MY ${unitProfit.toFixed(2)}`;
+
+            // 更新主要结果 - 人民币
+            elements.totalCostRmb.textContent = `Rmb ${totalCostRmb.toFixed(2)}`;
+            elements.grossProfitRmb.textContent = `Rmb ${grossProfitRmb.toFixed(2)}`;
+            elements.monthlyProfitRmb.textContent = `Rmb ${monthlyProfitRmb.toFixed(2)}`;
+            elements.unitProfitRmb.textContent = `Rmb ${unitProfitRmb.toFixed(2)}`;
+
+            // 更新成本明细
+            elements.costPriceDisplay.textContent = `MY ${costPrice.toFixed(2)}`;
+            elements.fixedOperationDisplay.textContent = `MY ${fixedOperationFee.toFixed(2)}`;
+            elements.seaShippingDisplay.textContent = `MY ${seaShippingCost.toFixed(2)}`;
+            elements.platformCommissionDisplay.textContent = `MY ${platformCommission.toFixed(2)}`;
+            elements.shippingDisplay.textContent = `MY ${shippingCost.toFixed(2)}`;
+
+            // 设置颜色 (盈利绿色，亏损红色)
+            if (grossProfit >= 0) {
+                elements.grossProfit.classList.remove('profit-negative');
+                elements.grossProfit.classList.add('profit-positive');
+                elements.profitMargin.classList.remove('profit-negative');
+                elements.profitMargin.classList.add('profit-positive');
+                elements.grossProfitRmb.classList.remove('profit-negative');
+                elements.grossProfitRmb.classList.add('profit-positive');
+            } else {
+                elements.grossProfit.classList.remove('profit-positive');
+                elements.grossProfit.classList.add('profit-negative');
+                elements.profitMargin.classList.remove('profit-positive');
+                elements.profitMargin.classList.add('profit-negative');
+                elements.grossProfitRmb.classList.remove('profit-positive');
+                elements.grossProfitRmb.classList.add('profit-negative');
+            }
+        }
+
+        function showProfitLevel(profitMargin, grossProfit) {
+            let text, className;
+
+            if (grossProfit < 0) {
+                text = "亏损产品 - 建议重新定价";
+                className = "profit-level profit-low";
+            } else if (profitMargin >= 50) {
+                text = "极高利润 - 优秀产品";
+                className = "profit-level profit-high";
+            } else if (profitMargin >= 30) {
+                text = "高利润 - 推荐产品";
+                className = "profit-level profit-high";
+            } else if (profitMargin >= 15) {
+                text = "中等利润 - 可接受";
+                className = "profit-level profit-medium";
+            } else {
+                text = "低利润 - 需要优化";
+                className = "profit-level profit-low";
+            }
+
+            elements.profitLevel.textContent = text;
+            elements.profitLevel.className = className;
+        }
+
+        function showAdvice(costPrice, salePrice, grossProfit, profitMargin) {
+            const adviceLines = [];
+
+            if (grossProfit < 0) {
+                adviceLines.push("产品亏损：建议提高售价或降低采购成本");
+            }
+
+            if (profitMargin < 10 && grossProfit > 0) {
+                adviceLines.push("利润偏低：考虑优化供应链或调整定价");
+            }
+
+            if (salePrice < costPrice * 1.5) {
+                adviceLines.push("定价建议：售价建议为成本的1.5倍以上");
+            }
+
+            if (grossProfit > 0 && profitMargin > 30) {
+                adviceLines.push("优秀产品：继续保持当前的定价策略");
+            }
+
+            if (adviceLines.length > 0) {
+                elements.adviceBox.textContent = adviceLines.join("\n");
+            } else {
+                elements.adviceBox.textContent = "";
+            }
+        }
+    </script>
+</body>
+</html>
